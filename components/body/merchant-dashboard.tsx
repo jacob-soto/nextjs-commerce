@@ -53,9 +53,9 @@ function RevenueChart() {
         {MONTHLY_REVENUE.map((month) => {
           const total = month.designer + month.intimates + month.athletics;
           const h = (total / maxVal) * 100;
-          const dH = (month.designer / total) * h;
-          const iH = (month.intimates / total) * h;
-          const aH = (month.athletics / total) * h;
+          const dH = (month.designer / total) * 100;
+          const iH = (month.intimates / total) * 100;
+          const aH = (month.athletics / total) * 100;
           return (
             <div
               key={month.month}
