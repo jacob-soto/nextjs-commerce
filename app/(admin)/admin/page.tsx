@@ -7,7 +7,7 @@ import {
   NOTIFICATIONS,
   DEPLOYMENT_EVENTS,
 } from "lib/platform/data";
-import { formatCurrency, timeAgo } from "lib/platform/utils";
+import { formatCurrency, timeAgo, providerLabel } from "lib/platform/utils";
 import Link from "next/link";
 
 export const metadata = { title: "Dashboard — NEXUS Platform" };
@@ -99,7 +99,11 @@ export default function AdminDashboardPage() {
                     {cluster.name}
                   </p>
                   <p className="text-xs text-neutral-500">
-                    {cluster.provider.toUpperCase()} &middot; {cluster.region}
+                    <span className={providerLabel(cluster.provider).color}>
+                      {providerLabel(cluster.provider).label}
+                    </span>
+                    {" "}
+                    &middot; {cluster.region}
                   </p>
                 </div>
                 <div className="flex items-center gap-3">
@@ -202,8 +206,10 @@ export default function AdminDashboardPage() {
                     <p className="text-xs text-neutral-500">{repo.language}</p>
                   </td>
                   <td className="py-2.5 pr-4">
-                    <span className="rounded bg-neutral-700 px-2 py-0.5 text-xs font-mono">
-                      {repo.deploymentTarget}
+                    <span
+                      className={`rounded bg-neutral-700 px-2 py-0.5 text-xs font-mono ${providerLabel(repo.deploymentTarget).color}`}
+                    >
+                      {providerLabel(repo.deploymentTarget).label}
                     </span>
                   </td>
                   <td className="py-2.5 pr-4 capitalize">{repo.environment}</td>
