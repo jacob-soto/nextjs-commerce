@@ -1,35 +1,42 @@
 import { NextResponse } from "next/server";
-import {
-  MAP_USERS,
-  DESIGNER_PRODUCTS,
-  INTIMATES_PRODUCTS,
-  ATHLETICS_PRODUCTS,
-  MERCHANT_STATS,
-} from "lib/body/data";
+import { getShopProducts } from "lib/body/shopify-products";
+import { getSuppliers } from "lib/body/suppliers";
+
+export const revalidate = 3600;
 
 export async function GET() {
+  const [designer, intimates, athletics, suppliers] = await Promise.all([
+    getShopProducts("designer"),
+    getShopProducts("intimates"),
+    getShopProducts("athletics"),
+    getSuppliers(),
+  ]);
+
   return NextResponse.json({
     platform: "body.app",
     version: "1.0.0",
     status: "operational",
+    sources: {
+      products: "shopify-storefront",
+      merchants:
+        "https://github.com/jcnrs3/best-dropshipping-tools (parsed README)",
+    },
     stats: {
-      activeUsers: MAP_USERS.filter((u) => u.status === "online").length,
-      totalUsers: MAP_USERS.length,
+      merchants: suppliers.length,
       shops: {
         designer: {
-          products: DESIGNER_PRODUCTS.length,
-          categories: [...new Set(DESIGNER_PRODUCTS.map((p) => p.category))],
+          products: designer.length,
+          categories: [...new Set(designer.map((p) => p.category))],
         },
         intimates: {
-          products: INTIMATES_PRODUCTS.length,
-          categories: [...new Set(INTIMATES_PRODUCTS.map((p) => p.category))],
+          products: intimates.length,
+          categories: [...new Set(intimates.map((p) => p.category))],
         },
         athletics: {
-          products: ATHLETICS_PRODUCTS.length,
-          categories: [...new Set(ATHLETICS_PRODUCTS.map((p) => p.category))],
+          products: athletics.length,
+          categories: [...new Set(athletics.map((p) => p.category))],
         },
       },
-      merchant: MERCHANT_STATS,
     },
   });
 }
