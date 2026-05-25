@@ -73,18 +73,29 @@ export async function GET(request: Request) {
           "notifications",
           "audit-log",
         ],
+        providers: {
+          "aws-ecs": "Amazon ECS Fargate clusters",
+          "gcp-gke": "Google Kubernetes Engine (GKE) clusters",
+          "gcp-cloudrun": "Google Cloud Run serverless containers",
+          kubernetes: "Self-managed Kubernetes clusters",
+          vercel: "Vercel edge deployments",
+          static: "Static site hosting",
+        },
         integrations: {
           "jacob-soto/Supervisor": "AWS ECS/ECR deployment infrastructure",
           "jacob-soto/kubectl-ai": "Kubernetes orchestration and automation",
           "jacob-soto/nationalsecurityagency.github.io":
             "Terraform IaC foundation",
-          "jacob-soto/nextjs-commerce": "E-commerce platform base",
+          "jacob-soto/nextjs-commerce":
+            "E-commerce platform base (GCP Cloud Run)",
           "jacob-soto/merchant-sdk-php": "Payment processing integration",
           "jacob-soto/dev-grid": "Financial management system",
           "jacob-soto/Jacob-Soto-The-commission-on-human-rights-pro-hac-vice":
             "Asset tracking system",
           "jacob-soto/kev-data": "CISA KEV vulnerability catalog",
           "jacob-soto/cyber.dhs.gov": "DHS cybersecurity compliance",
+          "jacob-soto/Argus-Advanced-Sentinel": "ARGUS AI assistant (GKE)",
+          "jacob-soto/my-nexus-app": "Document pipeline (GKE staging)",
         },
       });
   }

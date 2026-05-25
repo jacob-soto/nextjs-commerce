@@ -23,6 +23,8 @@ export type RepositoryStatus =
   | "pending";
 export type DeploymentTarget =
   | "aws-ecs"
+  | "gcp-cloudrun"
+  | "gcp-gke"
   | "kubernetes"
   | "vercel"
   | "static"
@@ -60,7 +62,7 @@ export type DeploymentStatus =
 export interface ClusterHealth {
   id: string;
   name: string;
-  provider: "aws-ecs" | "kubernetes";
+  provider: "aws-ecs" | "gcp-gke" | "gcp-cloudrun" | "kubernetes";
   region: string;
   status: "healthy" | "degraded" | "critical" | "unknown";
   nodesTotal: number;

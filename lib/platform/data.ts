@@ -351,6 +351,34 @@ export const CLUSTERS: ClusterHealth[] = [
     memoryUtilization: 40,
     lastChecked: "2025-05-25T01:15:00Z",
   },
+  {
+    id: "cluster-5",
+    name: "nexus-gke-primary",
+    provider: "gcp-gke",
+    region: "us-central1",
+    status: "healthy",
+    nodesTotal: 5,
+    nodesReady: 5,
+    podsRunning: 14,
+    podsDesired: 14,
+    cpuUtilization: 38,
+    memoryUtilization: 52,
+    lastChecked: "2025-05-25T01:15:00Z",
+  },
+  {
+    id: "cluster-6",
+    name: "nexus-cloudrun",
+    provider: "gcp-cloudrun",
+    region: "us-east4",
+    status: "healthy",
+    nodesTotal: 0,
+    nodesReady: 0,
+    podsRunning: 8,
+    podsDesired: 8,
+    cpuUtilization: 22,
+    memoryUtilization: 34,
+    lastChecked: "2025-05-25T01:15:00Z",
+  },
 ];
 
 // ─── Deployment Configs ───────────────────────────────────────────────────────
@@ -431,6 +459,51 @@ export const DEPLOYMENTS: DeploymentConfig[] = [
     lastDeployedAt: "2025-05-25T00:30:00Z",
     lastDeployedBy: "github-actions",
   },
+  {
+    id: "dep-6",
+    repoId: "repo-4",
+    target: "gcp-cloudrun",
+    environment: "production",
+    strategy: "canary",
+    status: "healthy",
+    region: "us-east4",
+    cluster: "nexus-cloudrun",
+    service: "nextjs-commerce-prod",
+    taskDefinition: "nextjs-commerce-rev-42",
+    containerName: "nextjs-commerce",
+    lastDeployedAt: "2025-05-25T01:00:00Z",
+    lastDeployedBy: "cloud-build",
+  },
+  {
+    id: "dep-7",
+    repoId: "repo-10",
+    target: "gcp-gke",
+    environment: "production",
+    strategy: "rolling",
+    status: "healthy",
+    region: "us-central1",
+    cluster: "nexus-gke-primary",
+    service: "argus-sentinel-svc",
+    taskDefinition: "argus-deploy-v8",
+    containerName: "argus-sentinel",
+    lastDeployedAt: "2025-05-24T14:00:00Z",
+    lastDeployedBy: "cloud-build",
+  },
+  {
+    id: "dep-8",
+    repoId: "repo-17",
+    target: "gcp-gke",
+    environment: "staging",
+    strategy: "rolling",
+    status: "healthy",
+    region: "us-central1",
+    cluster: "nexus-gke-primary",
+    service: "nexus-app-staging",
+    taskDefinition: "nexus-app-deploy-v3",
+    containerName: "nexus-app",
+    lastDeployedAt: "2025-05-22T14:00:00Z",
+    lastDeployedBy: "cloud-build",
+  },
 ];
 
 // ─── Deployment Events ────────────────────────────────────────────────────────
@@ -471,6 +544,30 @@ export const DEPLOYMENT_EVENTS: DeploymentEvent[] = [
     timestamp: "2025-05-25T00:30:00Z",
     type: "success",
     message: "Staging deployment completed. Running integration tests.",
+  },
+  {
+    id: "evt-6",
+    deploymentId: "dep-6",
+    timestamp: "2025-05-25T01:00:00Z",
+    type: "success",
+    message:
+      "Cloud Run revision deployed. Canary traffic split: 90/10 → 100/0.",
+  },
+  {
+    id: "evt-7",
+    deploymentId: "dep-7",
+    timestamp: "2025-05-24T14:00:00Z",
+    type: "success",
+    message:
+      "GKE rolling update completed. All replicas healthy on nexus-gke-primary.",
+  },
+  {
+    id: "evt-8",
+    deploymentId: "dep-8",
+    timestamp: "2025-05-22T14:05:00Z",
+    type: "info",
+    message:
+      "GKE staging deployment stabilized. Turbopack build completed in 4.2s.",
   },
 ];
 
@@ -1319,7 +1416,7 @@ export const AUDIT_LOG: AuditLogEntry[] = [
 
 export const PLATFORM_OVERVIEW: PlatformOverview = {
   repositories: { total: 22, active: 20, deploying: 1, error: 0 },
-  deployments: { healthy: 4, degraded: 1, pending: 0 },
+  deployments: { healthy: 7, degraded: 1, pending: 0 },
   revenue: { total: 14582400, monthly: 847500, pending: 125000 },
   assets: { total: 7, active: 7, pendingClaims: 3 },
   security: { vulnerabilities: 13, critical: 1, compliant: 2, scansRunning: 1 },

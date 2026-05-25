@@ -94,6 +94,23 @@ export function statusBgColor(status: string): string {
     error: "bg-red-400/10 border-red-400/30",
     deploying: "bg-blue-400/10 border-blue-400/30",
     scanning: "bg-blue-400/10 border-blue-400/30",
+    stabilizing: "bg-blue-400/10 border-blue-400/30",
+    pushing: "bg-blue-400/10 border-blue-400/30",
   };
   return colors[status] ?? "bg-gray-400/10 border-gray-400/30";
+}
+
+export function providerLabel(
+  provider: string,
+): { label: string; color: string } {
+  const providers: Record<string, { label: string; color: string }> = {
+    "aws-ecs": { label: "AWS ECS", color: "text-orange-400" },
+    "gcp-gke": { label: "GCP GKE", color: "text-blue-400" },
+    "gcp-cloudrun": { label: "GCP Cloud Run", color: "text-blue-300" },
+    kubernetes: { label: "Kubernetes", color: "text-cyan-400" },
+    vercel: { label: "Vercel", color: "text-white" },
+    static: { label: "Static", color: "text-neutral-400" },
+    none: { label: "None", color: "text-neutral-500" },
+  };
+  return providers[provider] ?? { label: provider, color: "text-neutral-400" };
 }

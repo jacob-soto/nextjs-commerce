@@ -6,7 +6,7 @@ import {
   DEPLOYMENTS,
   DEPLOYMENT_EVENTS,
 } from "lib/platform/data";
-import { timeAgo } from "lib/platform/utils";
+import { timeAgo, providerLabel } from "lib/platform/utils";
 
 export const metadata = { title: "Deployments — NEXUS Platform" };
 
@@ -22,8 +22,8 @@ export default function DeploymentsPage() {
           Deployment Orchestration
         </h1>
         <p className="text-sm text-neutral-400">
-          Multi-cloud deployment management across AWS ECS and Kubernetes
-          clusters
+          Multi-cloud deployment management across AWS ECS, GCP GKE, Cloud
+          Run, and Kubernetes clusters
         </p>
       </div>
 
@@ -93,7 +93,11 @@ export default function DeploymentsPage() {
               </div>
             </div>
             <p className="mt-2 text-[10px] text-neutral-500">
-              {cluster.provider.toUpperCase()} &middot; {cluster.region}
+              <span className={providerLabel(cluster.provider).color}>
+                {providerLabel(cluster.provider).label}
+              </span>
+              {" "}
+              &middot; {cluster.region}
             </p>
           </div>
         ))}
@@ -127,8 +131,10 @@ export default function DeploymentsPage() {
                       <p className="text-xs text-neutral-500">{repo?.name}</p>
                     </td>
                     <td className="py-2.5 pr-4">
-                      <span className="rounded bg-neutral-700 px-2 py-0.5 text-xs font-mono">
-                        {dep.target}
+                      <span
+                        className={`rounded bg-neutral-700 px-2 py-0.5 text-xs font-mono ${providerLabel(dep.target).color}`}
+                      >
+                        {providerLabel(dep.target).label}
                       </span>
                     </td>
                     <td className="py-2.5 pr-4 capitalize">
@@ -171,7 +177,11 @@ export default function DeploymentsPage() {
                   {repo.name}
                 </a>
                 <p className="text-xs text-neutral-500">
-                  {repo.deploymentTarget} &middot; {repo.environment}
+                  <span className={providerLabel(repo.deploymentTarget).color}>
+                    {providerLabel(repo.deploymentTarget).label}
+                  </span>
+                  {" "}
+                  &middot; {repo.environment}
                 </p>
               </div>
               <div className="ml-3 flex items-center gap-2">
