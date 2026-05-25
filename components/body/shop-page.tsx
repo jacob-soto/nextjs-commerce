@@ -13,6 +13,8 @@ interface ShopPageProps {
   products: Product[];
   categories: string[];
   bannerText: string;
+  /** Shopify collection handle this shop is wired to. Used in the empty-state hint. */
+  collectionHandle: string;
 }
 
 export function ShopPage({
@@ -23,6 +25,7 @@ export function ShopPage({
   products,
   categories,
   bannerText,
+  collectionHandle,
 }: ShopPageProps) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [sortBy, setSortBy] = useState<
@@ -106,12 +109,35 @@ export function ShopPage({
           {activeCategory !== "All" ? ` in ${activeCategory}` : ""}
         </div>
 
-        {/* Product grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {sorted.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {products.length === 0 ? (
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-8 text-center">
+            <div className="mb-3 text-4xl">🛍️</div>
+            <h2 className="text-lg font-semibold text-white">
+              No products from Shopify
+            </h2>
+            <p className="mt-2 text-sm text-zinc-400">
+              This shop pulls from the Shopify Storefront collection
+              <code className="mx-1 rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-zinc-200">
+                {collectionHandle}
+              </code>
+              . Set
+              <code className="mx-1 rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-zinc-200">
+                SHOPIFY_STORE_DOMAIN
+              </code>
+              and
+              <code className="mx-1 rounded bg-zinc-800 px-1.5 py-0.5 text-xs text-zinc-200">
+                SHOPIFY_STOREFRONT_ACCESS_TOKEN
+              </code>
+              and create that collection to populate this page.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {sorted.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

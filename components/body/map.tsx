@@ -2,7 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { MapUser } from "lib/body/data";
-import { MAP_USERS } from "lib/body/data";
+
+function Avatar({ user, size }: { user: MapUser; size: number }) {
+  // `avatar` may be either an emoji glyph (legacy) or an absolute URL
+  // pointing at a real supplier favicon. Pick the right renderer.
+  if (user.avatar.startsWith("http")) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={user.avatar}
+        alt={user.username}
+        width={size}
+        height={size}
+        className="rounded-full"
+        style={{ width: size, height: size }}
+      />
+    );
+  }
+  return <span style={{ fontSize: size * 0.8 }}>{user.avatar}</span>;
+}
 
 function UserCard({ user, onClose }: { user: MapUser; onClose: () => void }) {
   return (
@@ -15,7 +33,7 @@ function UserCard({ user, onClose }: { user: MapUser; onClose: () => void }) {
       </button>
       <div className="flex items-center gap-3">
         <div className="flex h-14 w-14 items-center justify-center rounded-full bg-zinc-800 text-2xl">
-          {user.avatar}
+          <Avatar user={user} size={36} />
         </div>
         <div>
           <h3 className="font-semibold text-white">{user.username}</h3>
@@ -37,9 +55,20 @@ function UserCard({ user, onClose }: { user: MapUser; onClose: () => void }) {
       </div>
       <p className="mt-3 text-sm text-zinc-300">{user.bio}</p>
       <div className="mt-4 flex gap-2">
-        <button className="flex-1 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 py-2 text-sm font-semibold transition-opacity hover:opacity-90">
-          Wave 👋
-        </button>
+        {user.url ? (
+          <a
+            href={user.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex-1 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 py-2 text-center text-sm font-semibold transition-opacity hover:opacity-90"
+          >
+            Visit site ↗
+          </a>
+        ) : (
+          <button className="flex-1 rounded-lg bg-gradient-to-r from-pink-500 to-purple-500 py-2 text-sm font-semibold transition-opacity hover:opacity-90">
+            Wave 👋
+          </button>
+        )}
         <button className="flex-1 rounded-lg border border-zinc-600 py-2 text-sm font-semibold text-zinc-300 transition-colors hover:border-zinc-500 hover:text-white">
           Message
         </button>
@@ -74,7 +103,7 @@ function UserListPanel({
             className="flex w-full items-center gap-2.5 rounded-lg p-2 text-left transition-colors hover:bg-zinc-800"
           >
             <div className="relative">
-              <span className="text-xl">{user.avatar}</span>
+              <Avatar user={user} size={20} />
               <span
                 className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-zinc-900 ${
                   user.status === "online" ? "bg-green-400" : "bg-yellow-400"
@@ -96,7 +125,7 @@ function UserListPanel({
   );
 }
 
-export function BodyMap() {
+export function BodyMap({ users }: { users: MapUser[] }) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<L.Map | null>(null);
   const [selectedUser, setSelectedUser] = useState<MapUser | null>(null);
@@ -125,13 +154,17 @@ export function BodyMap() {
 
       L.control.zoom({ position: "bottomright" }).addTo(map);
 
-      MAP_USERS.forEach((user) => {
+      users.forEach((user) => {
         const color =
           user.status === "online"
             ? "#4ade80"
             : user.status === "idle"
               ? "#facc15"
               : "#71717a";
+
+        const avatarHtml = user.avatar.startsWith("http")
+          ? `<img src="${user.avatar}" alt="" style="width:20px;height:20px;border-radius:50%" />`
+          : user.avatar;
 
         const icon = L.divIcon({
           className: "custom-marker",
@@ -143,7 +176,7 @@ export function BodyMap() {
             display: flex; align-items: center; justify-content: center;
             font-size: 16px; cursor: pointer;
             box-shadow: 0 0 12px ${color}44;
-          ">${user.avatar}</div>`,
+          ">${avatarHtml}</div>`,
           iconSize: [36, 36],
           iconAnchor: [18, 18],
         });
@@ -163,7 +196,7 @@ export function BodyMap() {
         mapInstance.current = null;
       }
     };
-  }, []);
+  }, [users]);
 
   return (
     <div className="relative h-full w-full">
@@ -178,23 +211,33 @@ export function BodyMap() {
         </div>
       )}
 
-      {mapReady && (
-        <UserListPanel users={MAP_USERS} onSelect={setSelectedUser} />
+      {mapReady && users.length > 0 && (
+        <UserListPanel users={users} onSelect={setSelectedUser} />
       )}
 
       {selectedUser && (
         <UserCard user={selectedUser} onClose={() => setSelectedUser(null)} />
       )}
 
-      {mapReady && (
+      {mapReady && users.length === 0 && (
+        <div className="absolute top-20 left-4 z-20 max-w-sm rounded-2xl border border-zinc-700 bg-zinc-900/95 p-4 shadow-2xl backdrop-blur-xl">
+          <h3 className="text-sm font-semibold text-white">No merchants</h3>
+          <p className="mt-1 text-xs text-zinc-400">
+            Failed to load merchants from the upstream source. Check the
+            jcnrs3/best-dropshipping-tools README is reachable.
+          </p>
+        </div>
+      )}
+
+      {mapReady && users.length > 0 && (
         <div className="absolute bottom-6 left-1/2 z-20 -translate-x-1/2">
           <div className="flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/90 px-4 py-2 backdrop-blur-xl">
             <span className="h-2 w-2 rounded-full bg-green-400" />
             <span className="text-sm text-zinc-300">
               <strong className="text-white">
-                {MAP_USERS.filter((u) => u.status === "online").length}
+                {users.filter((u) => u.status === "online").length}
               </strong>{" "}
-              people nearby
+              merchants nearby
             </span>
           </div>
         </div>
