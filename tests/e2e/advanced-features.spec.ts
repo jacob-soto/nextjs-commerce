@@ -114,4 +114,41 @@ test.describe("admin a11y primitives", () => {
     await expect(security).toHaveAttribute("aria-checked", "true");
     await expect(all).toHaveAttribute("aria-checked", "false");
   });
+
+  test("filter radiogroup supports arrow-key navigation (WCAG ARIA radio pattern)", async ({
+    page,
+  }) => {
+    await page.goto("/admin/advanced");
+
+    const all = page.getByTestId("filter-all");
+    const platform = page.getByTestId("filter-platform");
+    const commerce = page.getByTestId("filter-commerce");
+
+    await all.focus();
+    await expect(all).toHaveAttribute("aria-checked", "true");
+    await expect(all).toHaveAttribute("tabindex", "0");
+    await expect(platform).toHaveAttribute("tabindex", "-1");
+
+    await page.keyboard.press("ArrowRight");
+    await expect(platform).toBeFocused();
+    await expect(platform).toHaveAttribute("aria-checked", "true");
+    await expect(all).toHaveAttribute("aria-checked", "false");
+
+    await page.keyboard.press("ArrowRight");
+    await expect(commerce).toBeFocused();
+    await expect(commerce).toHaveAttribute("aria-checked", "true");
+
+    await page.keyboard.press("ArrowLeft");
+    await expect(platform).toBeFocused();
+    await expect(platform).toHaveAttribute("aria-checked", "true");
+
+    await page.keyboard.press("End");
+    const last = page.getByTestId("filter-developer");
+    await expect(last).toBeFocused();
+    await expect(last).toHaveAttribute("aria-checked", "true");
+
+    await page.keyboard.press("Home");
+    await expect(all).toBeFocused();
+    await expect(all).toHaveAttribute("aria-checked", "true");
+  });
 });
